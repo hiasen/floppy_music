@@ -40,7 +40,7 @@ def play_frequency(freq, duration, direction):
     periode = 1.0/freq
     GPIO.output(DIRECTION, direction)
     step_number = int(duration/periode)
-    settings['position'] += step_number
+#    settings['position'] += step_number
 
     for i in xrange(step_number):
         GPIO.output(STEP, True)
