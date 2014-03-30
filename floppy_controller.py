@@ -11,6 +11,9 @@ TRUE_DIRECTION = FORWARD
 END_POSITION = 80
 
 A_NOTE = 440.
+#A_NOTE = 150.
+# (direction, step)
+FLOPPY_LIST = [(3,5),(7,8),(10,12),(18,16),(19,15),(13,11)]
 
 def direction_to_boolean(direction):
     return direction==TRUE_DIRECTION
@@ -95,16 +98,15 @@ class FloppyThread(threading.Thread):
         self.stop_playing()
         self._killed = True
         self._play_event.set()
-        
 
 
 class FloppyManager(object):
 
-    def __init__(self, floppy_list):
+    def __init__(self, floppy_list=FLOPPY_LIST):
         self.all_floppys = []
         for i,pins in enumerate(floppy_list):
             dir_pin, step_pin = pins
-            
+
             ft = FloppyThread(name='floppy{}'.format(i), dir_pin=dir_pin, step_pin=step_pin )
             ft.start()
             ft.reset_drive()
@@ -132,10 +134,6 @@ class FloppyManager(object):
     def kill_all_threads(self):
         for floppy in self.all_floppys:
             floppy.kill_thread()
-        
-        
-
-
 
 
 def test1():
@@ -177,8 +175,8 @@ def test2():
     except KeyboardInterrupt:
         fm.kill_all_threads()
         GPIO.cleanup()
-    
-    
+
+
 
 if __name__ == '__main__':
     test2()
