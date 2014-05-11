@@ -7,16 +7,13 @@ GPIO.setmode(GPIO.BOARD)
 
 FORWARD = 1
 BACKWARD = -1
-TRUE_DIRECTION = FORWARD
 END_POSITION = 80
 
 A_NOTE = 440.
-#A_NOTE = 150.
-# (direction, step)
-FLOPPY_LIST = [(3,5),(7,8),(10,12),(18,16),(19,15),(13,11)]
+FLOPPY_LIST = [(18,16),(10,12),(13,11),(3,5),(7,8),(19,15)]
 
 def direction_to_boolean(direction):
-    return direction==TRUE_DIRECTION
+    return direction==FORWARD
 
 def midi_note_to_frequency(midi_note_number):
     return A_NOTE*2.**((midi_note_number-69)/12.)
@@ -32,8 +29,8 @@ class FloppyThread(threading.Thread):
         self._play_event = threading.Event()
         self.dir_pin = dir_pin
         self.step_pin = step_pin
-	GPIO.setup(step_pin, GPIO.OUT)
-	GPIO.setup(dir_pin, GPIO.OUT)
+        GPIO.setup(step_pin, GPIO.OUT)
+        GPIO.setup(dir_pin, GPIO.OUT)
 
         threading.Thread.__init__(self, name=name)
 
@@ -112,6 +109,7 @@ class FloppyManager(object):
             ft.reset_drive()
             self.all_floppys.append(ft)
 
+        self.all_floppys.reverse()
         self.free_floppys = self.all_floppys[:]
         self.playing = {}
 
@@ -129,7 +127,7 @@ class FloppyManager(object):
             return
         floppy = self.playing.pop(note)
         floppy.stop_playing()
-        self.free_floppys.append(floppy) 
+        self.free_floppys.append(floppy)
 
     def kill_all_threads(self):
         for floppy in self.all_floppys:
